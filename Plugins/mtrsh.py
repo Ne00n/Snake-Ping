@@ -1,6 +1,7 @@
 import requests, json, re
+from Plugins.base import Base
 
-class mtrsh():
+class mtrsh(Base):
 
     mapping = {}
     headers = {
@@ -12,6 +13,7 @@ class mtrsh():
     
     def __init__(self):
         print("mtr.sh Loading")
+        self.load()
 
     def prepare(self):
         print("mtr.sh Preparing")
@@ -21,14 +23,12 @@ class mtrsh():
         for name,details in probes.items():
             if details['status'] is False: continue
             if not details['country'] in self.mapping: self.mapping[details['country']] = []
-            self.mapping[details['country']].append({"probe":name,"provider":details['provider']})
+            self.mapping[details['country']].append({"probe":name,"provider":details['provider'],"city":details['city']})
         return True
 
-    def engage(self,country,target):
+    def engage(self,origin,target):
         print("mtr.sh Running")
-        with open('mapping.json', 'r') as f:
-            mapping = json.load(f)
-        country = mapping[country]
+        country = self.getCountry(origin)
         if not country in self.mapping:
             print("No Probes found in Target Country")
             return False
@@ -40,7 +40,7 @@ class mtrsh():
             if response.status_code != 200: continue
             result = re.findall("avg\/.*?=.*?\/([0-9.]+)",response.text, re.MULTILINE)
             if not result: continue
-            results[probe['probe']] = {"provider":probe['provider'],"avg":result[0]}
+            results[probe['probe']] = {"provider":probe['provider'],"city":probe['city'],"avg":result[0]}
         return results
 
 
