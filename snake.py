@@ -1,7 +1,7 @@
 import importlib.util
 import sys, os
 
-print("Multi-Ping-Snake-Edition")
+print("Snake-Ping")
 plugins = os.listdir("Plugins")
 
 if len(sys.argv) < 3: exit("Missing params, e.g NL 1.1.1.1")
