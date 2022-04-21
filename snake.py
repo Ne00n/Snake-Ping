@@ -7,11 +7,13 @@ plugins = os.listdir("Plugins")
 if len(sys.argv) < 3: exit("Missing params, e.g NL 1.1.1.1")
 origin = sys.argv[1]
 target = sys.argv[2]
+pluginToLoad = sys.argv[3] if len(sys.argv) == 4 else ""
 
 data = {}
 for filename in plugins:
     if not filename.endswith(".py") or filename == "base.py": continue
     plugin = filename.replace(".py","")
+    if pluginToLoad != "" and plugin != pluginToLoad: continue
     myClass = getattr(importlib.import_module(f"Plugins.{plugin}"), plugin)
     myInstance = myClass()
     response = myInstance.prepare()
