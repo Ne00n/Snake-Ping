@@ -1,1 +1,1 @@
-# Multi-Ping-Snake-Edition
+# Snake-Ping
