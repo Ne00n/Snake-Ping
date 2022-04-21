@@ -8,15 +8,17 @@ class Base():
 
     def find(self,target,field):
         for row in self.map:
-            if row[field] == target: return row
+            if target in row[field]: return row
 
     def GetAlpha2(self,target):
         if len(target) == 2: return target
         elif len(target) == 3:
             result = self.find(target,"alpha-3")
+            if not result: return False
             return result['alpha-2']
         elif len(target) > 3:
             result = self.find(target,"name")
+            if not result: return False
             return result['alpha-2']
 
     def getCountry(self,target):
