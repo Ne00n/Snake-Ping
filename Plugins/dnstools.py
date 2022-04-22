@@ -16,15 +16,10 @@ class dnstools(Base):
     async def browse(self,target):
         browser = await launch()
         page = await browser.newPage()
-        await page.goto(f"https://dnstools.ws/ping/1.1.1.1/", {'waitUntil' : 'domcontentloaded'})
+        await page.goto(f"https://dnstools.ws/ping/{target}/", {'waitUntil' : 'domcontentloaded'})
 
         await asyncio.sleep(10)
-
-        html = await page.evaluate('''() => {
-        return {
-            html: document.body.innerHTML,
-        }
-    }''')
+        html = await page.content()
 
         await page.close()
         await browser.close()
@@ -34,7 +29,7 @@ class dnstools(Base):
         print("dnstools.ws Running")
 
         html = asyncio.run(self.browse(target))
-        soup = BeautifulSoup(html['html'],"html.parser")
+        soup = BeautifulSoup(html,"html.parser")
         results = {}
         for tr in soup.findAll('tr'):
             if tr.has_attr("class") == False or "dns-detail-expanded" in tr['class']: continue
