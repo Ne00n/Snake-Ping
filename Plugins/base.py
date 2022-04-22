@@ -25,9 +25,11 @@ class Base():
     def getCountry(self,target):
         if len(target) == 2:
             result = self.find(target,"alpha-2")
+            if not result: return False
             return result['name']
         elif len(target) == 3:
             result = self.find(target,"alpha-3")
+            if not result: return False
             return result['name']
         elif len(target) > 3: return target
 

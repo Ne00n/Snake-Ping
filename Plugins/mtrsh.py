@@ -3,6 +3,7 @@ from Plugins.base import Base
 
 class mtrsh(Base):
 
+    localMapping = {"UK":"GB"}
     mapping = {}
     headers = {
         'Host':'mtr.sh',
@@ -26,6 +27,7 @@ class mtrsh(Base):
 
     def engage(self,origin,target):
         print("Running mtr.sh")
+        if origin in self.localMapping: origin = self.localMapping[origin]
         country = self.getCountry(origin)
         if not country in self.mapping:
             print("No Probes found in Target Country")
