@@ -13,21 +13,9 @@ class pingpe(Base):
         print("ping.pe Preparing")
         return True
 
-    async def browse(self,target):
-        browser = await launch()
-        page = await browser.newPage()
-        await page.goto(f"https://ping.pe/{target}/", {'waitUntil' : 'domcontentloaded'})
-
-        await asyncio.sleep(10)
-        html = await page.content()
-
-        await page.close()
-        await browser.close()
-        return html
-
     def engage(self,origin,target):
         print("ping.pe Running")
-        html = asyncio.run(self.browse(target))
+        html = asyncio.run(self.browse(f"https://ping.pe/{target}/"))
 
         soup = BeautifulSoup(html,"html.parser")
         rows = soup.findAll('tr', id=re.compile('^ping-'))

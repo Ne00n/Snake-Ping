@@ -13,22 +13,10 @@ class dnstools(Base):
         print("dnstools.ws Preparing")
         return True
 
-    async def browse(self,target):
-        browser = await launch()
-        page = await browser.newPage()
-        await page.goto(f"https://dnstools.ws/ping/{target}/", {'waitUntil' : 'domcontentloaded'})
-
-        await asyncio.sleep(10)
-        html = await page.content()
-
-        await page.close()
-        await browser.close()
-        return html
-
     def engage(self,origin,target):
         print("dnstools.ws Running")
 
-        html = asyncio.run(self.browse(target))
+        html = asyncio.run(self.browse(f"https://dnstools.ws/ping/{target}/"))
         soup = BeautifulSoup(html,"html.parser")
         results = {}
         for tr in soup.findAll('tr'):

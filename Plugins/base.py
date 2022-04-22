@@ -1,4 +1,5 @@
-import json, re
+from pyppeteer import launch
+import asyncio, json, re
 
 class Base():
 
@@ -30,4 +31,14 @@ class Base():
             return result['name']
         elif len(target) > 3: return target
 
+    async def browse(self,target):
+        browser = await launch()
+        page = await browser.newPage()
+        await page.goto(target, {'waitUntil' : 'domcontentloaded'})
 
+        await asyncio.sleep(10)
+        html = await page.content()
+
+        await page.close()
+        await browser.close()
+        return html
