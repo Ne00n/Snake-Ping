@@ -6,15 +6,13 @@ import asyncio, re
 class dnstools(Base):
     
     def __init__(self):
-        print("dnstools.ws Loading")
         self.load()
 
     def prepare(self):
-        print("dnstools.ws Preparing")
         return True
 
     def engage(self,origin,target):
-        print("dnstools.ws Running")
+        print("Running dnstools.ws")
 
         html = asyncio.run(self.browse(f"https://dnstools.ws/ping/{target}/"))
         soup = BeautifulSoup(html,"html.parser")
@@ -40,6 +38,7 @@ class dnstools(Base):
                     avg = td.renderContents().decode().replace("ms","")
                 elif index == 3:
                     if origin == self.GetAlpha2(country):
-                        results[f"{city}{country}"] = {"provider":"n/a","avg":float(avg),"city":city}
+                        results[f"{city}{country}"] = {"provider":"n/a","avg":float(avg),"city":city,"source":self.__class__.__name__}
+        print("Done dnstools.ws")
         return results
 

@@ -1,3 +1,4 @@
+import multiprocessing
 import importlib.util
 import sys, os
 
@@ -9,31 +10,34 @@ origin = sys.argv[1]
 target = sys.argv[2]
 pluginToLoad = sys.argv[3] if len(sys.argv) == 4 else ""
 
-data = {}
+data,toLoad = {},[]
 for filename in plugins:
     if not filename.endswith(".py") or filename == "base.py": continue
     plugin = filename.replace(".py","")
     if pluginToLoad != "" and plugin != pluginToLoad: continue
+    toLoad.append(plugin)
+
+def run(plugin):
     myClass = getattr(importlib.import_module(f"Plugins.{plugin}"), plugin)
     myInstance = myClass()
     response = myInstance.prepare()
     if response is not True:
         print(f"{plugin} failed to prepare")
-        continue
-    response = myInstance.engage(origin,target)
-    data[plugin] = response
+        return {}
+    return myInstance.engage(origin,target)
 
-results = {}
-for plugin,pluginData in data.items():
-    if not pluginData: continue
-    for probe,details in pluginData.items():
-        results[probe] = {"plugin":plugin,"avg":float(details['avg']),"provider":details['provider'],"city":details['city']}
+pool = multiprocessing.Pool(processes = 4)
+results,dataUnsorted = pool.map(run, toLoad),{}
+for data in results:
+    if not data: continue
+    for probe,details in data.items():
+        dataUnsorted[probe] = {"plugin":details['source'],"avg":float(details['avg']),"provider":details['provider'],"city":details['city']}
 
 output = []
 output.append("Latency\tSource\tCity\tProvider")
 output.append("-------\t-------\t-------\t-------")
-results = sorted(results.items(), key=lambda x: x[1]['avg'])
-for data in results:
+dataSorted = sorted(dataUnsorted.items(), key=lambda x: x[1]['avg'])
+for data in dataSorted:
     avg = "{:.2f}ms".format(data[1]['avg'])
     output.append(f"{avg}\t{data[1]['plugin']}\t{data[1]['city']}\t{data[1]['provider']}")
 

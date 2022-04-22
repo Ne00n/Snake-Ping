@@ -12,11 +12,9 @@ class mtrsh(Base):
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'}
     
     def __init__(self):
-        print("mtr.sh Loading")
         self.load()
 
     def prepare(self):
-        print("mtr.sh Preparing")
         response = requests.get(url="https://mtr.sh/probes.json", headers=self.headers)
         if response.status_code != 200: return False
         probes = response.json()
@@ -27,7 +25,7 @@ class mtrsh(Base):
         return True
 
     def engage(self,origin,target):
-        print("mtr.sh Running")
+        print("Running mtr.sh")
         country = self.getCountry(origin)
         if not country in self.mapping:
             print("No Probes found in Target Country")
@@ -39,7 +37,8 @@ class mtrsh(Base):
             if response.status_code != 200: continue
             result = re.findall("avg\/.*?=.*?\/([0-9.]+)",response.text, re.MULTILINE)
             if not result: continue
-            results[probe['probe']] = {"provider":probe['provider'],"city":probe['city'],"avg":result[0]}
+            results[probe['probe']] = {"provider":probe['provider'],"city":probe['city'],"avg":result[0],"source":self.__class__.__name__}
+        print("Done mtr.sh")
         return results
 
 

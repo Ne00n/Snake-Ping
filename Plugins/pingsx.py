@@ -6,11 +6,9 @@ import asyncio, re
 class pingsx(Base):
     
     def __init__(self):
-        print("ping.sx Loading")
         self.load()
 
     def prepare(self):
-        print("ping.sx Preparing")
         return True
 
     async def browse(self,target):
@@ -34,7 +32,7 @@ class pingsx(Base):
         return html
 
     def engage(self,origin,target):
-        print("ping.sx Running")
+        print("Running ping.sx")
 
         html = asyncio.run(self.browse(target))
         soup = BeautifulSoup(html,"html.parser")
@@ -51,6 +49,7 @@ class pingsx(Base):
                 elif index == 6:
                     avg = re.findall('>(.*?)<',str(td) , re.MULTILINE)[0]
                     if origin == self.GetAlpha2(country):
-                        results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg,"city":city}
+                        results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg,"city":city,"source":self.__class__.__name__}
+        print("Done ping.sx")
         return results
 
