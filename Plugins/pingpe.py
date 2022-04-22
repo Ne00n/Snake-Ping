@@ -1,7 +1,7 @@
-from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 from Plugins.base import Base
-import re
+from pyppeteer import launch
+import asyncio, re
 
 class pingpe(Base):
     
@@ -13,14 +13,23 @@ class pingpe(Base):
         print("ping.pe Preparing")
         return True
 
+    async def browse(self,target):
+        browser = await launch()
+        page = await browser.newPage()
+        await page.goto(f"https://ping.pe/{target}/", {'waitUntil' : 'domcontentloaded'})
+
+        await asyncio.sleep(10)
+        html = await page.content()
+
+        await page.close()
+        await browser.close()
+        return html
+
     def engage(self,origin,target):
         print("ping.pe Running")
+        html = asyncio.run(self.browse(target))
 
-        session = HTMLSession()
-        resp = session.get(f"https://ping.pe/{target}")
-        resp.html.render(sleep=10)
-
-        soup = BeautifulSoup(resp.html.html,"html.parser")
+        soup = BeautifulSoup(html,"html.parser")
         rows = soup.findAll('tr', id=re.compile('^ping-'))
         results = {}
         for row in rows:

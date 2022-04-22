@@ -1,7 +1,7 @@
 from Plugins.base import Base
 from bs4 import BeautifulSoup
 from pyppeteer import launch
-import asyncio, time, re
+import asyncio, re
 
 class pingsx(Base):
     
