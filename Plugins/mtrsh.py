@@ -35,7 +35,6 @@ class mtrsh(Base):
         probes = self.mapping[country]
         results = {}
         for probe in probes:
-            print(f"mtr.sh {probe['provider']}")
             response = requests.get(url=f"https://mtr.sh/{probe['probe']}/ping/{target}", headers=self.headers)
             if response.status_code != 200: continue
             result = re.findall("avg\/.*?=.*?\/([0-9.]+)",response.text, re.MULTILINE)
