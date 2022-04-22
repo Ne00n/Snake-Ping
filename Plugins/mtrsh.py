@@ -7,7 +7,7 @@ class mtrsh(Base):
     headers = {
         'Host':'mtr.sh',
         'Accept':'application/json;',
-        'X-Application-For':'Multi-Ping',
+        'X-Application-For':'Snake-Ping',
         'Accept-Encoding':'gzip, deflate',
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'}
     
