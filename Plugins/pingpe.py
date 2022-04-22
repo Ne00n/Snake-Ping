@@ -13,7 +13,7 @@ class pingpe(Base):
 
     def engage(self,origin,target):
         print("Running ping.pe")
-        html = asyncio.run(self.browse(f"https://ping.pe/{target}/"))
+        html = asyncio.run(self.browse(f"https://ping.pe/{target}"))
 
         soup = BeautifulSoup(html,"html.parser")
         rows = soup.findAll('tr', id=re.compile('^ping-'))
