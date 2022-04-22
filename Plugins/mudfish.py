@@ -26,13 +26,17 @@ class mudfish(Base):
 
         soup = BeautifulSoup(html,"html.parser")
         inputs = soup.findAll('input', id=re.compile('^checkbox_node_'))
-        marked = 0
+        probes = []
         for input in inputs:
-            if input['location'].startswith(country) and marked <= 30:
+            if input['location'].startswith(country) and len(probes) <= 29:
+                location = re.findall('\((.*?-\s.*?)(\)|\s[0-9]+)',str(input['location']) , re.MULTILINE)
+                if location[0][0] in probes: continue
                 element = await page.querySelector(f"#{input['id']}")
                 await element.click()
-                marked += 1
-            if marked == 30: print("Warning mudfish, reached limit of 30 probes")
+                probes.append(location[0][0])
+            if len(probes) == 29: 
+                print("Warning mudfish, reached the limit of 29 probes")
+                break
 
         element = await page.querySelector('#ping_start')
         await element.click()
