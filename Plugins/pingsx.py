@@ -47,9 +47,10 @@ class pingsx(Base):
                 elif index == 1:
                     provider = re.findall('>(.{1,25}?)<',str(td) , re.MULTILINE)[0]
                 elif index == 6:
-                    avg = re.findall('>(.*?)<',str(td) , re.MULTILINE)[0]
+                    avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
+                    if not avg: continue
                     if origin == self.GetAlpha2(country):
-                        results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg,"city":city,"source":self.__class__.__name__}
+                        results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"source":self.__class__.__name__}
         print("Done ping.sx")
         return results
 
