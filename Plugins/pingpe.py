@@ -5,6 +5,8 @@ import asyncio, re
 
 class pingpe(Base):
     
+    localMapping = {"UAE":"ARE"}
+
     def __init__(self):
         self.load()
 
@@ -13,6 +15,8 @@ class pingpe(Base):
 
     def engage(self,origin,target):
         print("Running ping.pe")
+
+        if origin in self.localMapping: origin = self.localMapping[origin]
         html = asyncio.run(self.browse(f"https://ping.pe/{target}"))
 
         soup = BeautifulSoup(html,"html.parser")
@@ -37,7 +41,6 @@ class pingpe(Base):
                 location = country[0].split(", ")
                 country = location[0]
                 city = location[2]
-            if "UAE" == country: country = "ARE"
             if origin == self.GetAlpha2(country):
                 results[probe[0]] = {"provider":provider[0],"avg":avg[0],"city":city,"source":self.__class__.__name__}
         print("Done ping.pe")
