@@ -33,12 +33,12 @@ class Base():
             return result['name']
         elif len(target) > 3: return target
 
-    async def browse(self,target):
+    async def browse(self,target,wait=10):
         browser = await launch()
         page = await browser.newPage()
         await page.goto(target, {'waitUntil' : 'domcontentloaded'})
 
-        await asyncio.sleep(10)
+        await asyncio.sleep(wait)
         html = await page.content()
 
         await page.close()
