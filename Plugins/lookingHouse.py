@@ -24,7 +24,7 @@ class lookingHouse(Base):
 
     def run(self,point):
         html = self.browseWrapper(f"https://looking.house/point.php?id={point[0]}&d={self.target}&f=ping",0,"pre")
-        if html == False: return False
+        if html == False: return {}
         soup = BeautifulSoup(html,"html.parser")
         pre = soup.findAll('pre')
         avg = re.findall('avg\/.*?=.*?\/([0-9.]+)',str(pre[0]) , re.MULTILINE | re.DOTALL)
