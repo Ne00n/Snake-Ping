@@ -52,6 +52,10 @@ class mudfish(Base):
     def engage(self,origin,target):
         print("Running mudfish")
 
+        if not self.validateIP(target):
+            print("mudfish does only work with IP's")
+            return False
+
         html = asyncio.run(self.browse(target,origin))
         soup = BeautifulSoup(html,"html.parser")
 

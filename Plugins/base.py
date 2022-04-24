@@ -1,5 +1,5 @@
 from pyppeteer import launch
-import asyncio, time, json, re
+import ipaddress, asyncio, time, json, re
 
 class Base():
 
@@ -32,6 +32,13 @@ class Base():
             if not result: return False
             return result['name']
         elif len(target) > 3: return target
+
+    def validateIP(self,address):
+        try:
+            ip = ipaddress.ip_address(address)
+            return True
+        except ValueError:
+            return False
 
     async def browse(self,target,wait=10,element=""):
         browser = await launch()
