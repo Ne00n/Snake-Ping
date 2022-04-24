@@ -1,5 +1,6 @@
-import requests, json, re
 from Plugins.base import Base
+import requests, json, re
+import multiprocessing
 
 class mtrsh(Base):
 
@@ -25,6 +26,14 @@ class mtrsh(Base):
             self.mapping[details['country']].append({"probe":name,"provider":details['provider'],"city":details['city']})
         return True
 
+    def run(self,probe):
+        response = requests.get(url=f"https://mtr.sh/{probe['probe']}/ping/{self.target }", headers=self.headers)
+        if response.status_code != 200: return {}
+        avg = re.findall("avg\/.*?=.*?\/([0-9.]+)",response.text, re.MULTILINE)
+        if not avg: return {}
+        probe['avg'] = avg[0]
+        return probe
+
     def engage(self,origin,target):
         print("Running mtr.sh")
         if origin in self.localMapping: origin = self.localMapping[origin]
@@ -32,15 +41,16 @@ class mtrsh(Base):
         if not country in self.mapping:
             print("Warning mtr.sh, No Probes found in Target Country")
             return False
-        probes = self.mapping[country]
-        results = {}
-        for probe in probes:
-            response = requests.get(url=f"https://mtr.sh/{probe['probe']}/ping/{target}", headers=self.headers)
-            if response.status_code != 200: continue
-            result = re.findall("avg\/.*?=.*?\/([0-9.]+)",response.text, re.MULTILINE)
-            if not result: continue
-            results[probe['probe']] = {"provider":probe['provider'],"city":probe['city'],"avg":result[0],"source":self.__class__.__name__}
+
+        output = {}
+        self.target = target
+        pool = multiprocessing.Pool(processes = 4)
+        results = pool.map(self.run, self.mapping[country])
+
+        for result in results:
+            if not "avg" in result: continue
+            output[result['probe']] = {"provider":result['provider'],"city":result['city'],"avg":result['avg'],"source":self.__class__.__name__}
         print("Done mtr.sh")
-        return results
+        return output
 
 
