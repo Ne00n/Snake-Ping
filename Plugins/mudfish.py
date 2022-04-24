@@ -1,7 +1,7 @@
 from Plugins.base import Base
 from bs4 import BeautifulSoup
 from pyppeteer import launch
-import asyncio, re
+import asyncio, socket, re
 
 class mudfish(Base):
     
@@ -53,8 +53,11 @@ class mudfish(Base):
         print("Running mudfish")
 
         if not self.validateIP(target):
-            print("mudfish does only work with IP's")
-            return False
+            try:
+                ip = socket.gethostbyname(target)
+                target = ip
+            except:
+                return False
 
         html = asyncio.run(self.browse(target,origin))
         soup = BeautifulSoup(html,"html.parser")
