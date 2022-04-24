@@ -26,7 +26,7 @@ def run(plugin):
         return {}
     return myInstance.engage(origin,target)
 
-pool = multiprocessing.Pool(processes = 5)
+pool = multiprocessing.Pool(processes = 6)
 results,dataUnsorted = pool.map(run, toLoad),{}
 for data in results:
     if not data: continue
