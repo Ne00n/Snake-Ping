@@ -38,6 +38,11 @@ class mudfish(Base):
                 print("Warning mudfish, reached the limit of 29 probes")
                 break
 
+        html = ""
+        if len(probes) == 0:
+            print("Warning mudfish, No Probes found in Target Country")
+            return html
+
         element = await page.querySelector('#ping_start')
         await element.click()
 
@@ -64,17 +69,18 @@ class mudfish(Base):
 
         results = {}
         tbody = soup.findAll('tbody')
-        for tr in tbody[0].findAll('tr'):
-            for index, td in enumerate(tr.findAll('td')):
-                if index == 0:
-                    location = re.findall('<td>([A-Z]{2})\s(.*?)\s\((.*?)\s-\s(.*?)\)',str(td) , re.MULTILINE)
-                    provider = location[0][3]
-                    country = location[0][0]
-                    city = location[0][2]
-                elif index == 4:
-                    avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
-                    if not avg: continue
-                    results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"source":self.__class__.__name__}
+        if tbody:
+            for tr in tbody[0].findAll('tr'):
+                for index, td in enumerate(tr.findAll('td')):
+                    if index == 0:
+                        location = re.findall('<td>([A-Z]{2})\s(.*?)\s\((.*?)\s-\s(.*?)\)',str(td) , re.MULTILINE)
+                        provider = location[0][3]
+                        country = location[0][0]
+                        city = location[0][2]
+                    elif index == 4:
+                        avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
+                        if not avg: continue
+                        results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"source":self.__class__.__name__}
         print("Done mudfish")
         return results
 
