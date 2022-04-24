@@ -1,4 +1,4 @@
-import multiprocessing
+from concurrent.futures import ProcessPoolExecutor as Pool
 import importlib.util
 import sys, os
 
@@ -26,7 +26,7 @@ def run(plugin):
         return {}
     return myInstance.engage(origin,target)
 
-pool = multiprocessing.Pool(processes = 6)
+pool = Pool(max_workers=6)
 results,dataUnsorted = pool.map(run, toLoad),{}
 for data in results:
     if not data: continue
