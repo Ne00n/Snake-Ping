@@ -30,7 +30,7 @@ class mtrsh(Base):
         if origin in self.localMapping: origin = self.localMapping[origin]
         country = self.getCountry(origin)
         if not country in self.mapping:
-            print("No Probes found in Target Country")
+            print("Warning mtr.sh, No Probes found in Target Country")
             return False
         probes = self.mapping[country]
         results = {}

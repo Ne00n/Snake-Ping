@@ -36,7 +36,7 @@ class lookingHouse(Base):
         if origin in self.localMapping: origin = self.localMapping[origin]
         country = self.getCountry(origin)
         if not country in self.mapping:
-            print("No Probes found in Target Country")
+            print("Warning lookingHouse, No Probes found in Target Country")
             return False
         
         countryID = self.mapping[country]
