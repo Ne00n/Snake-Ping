@@ -7,6 +7,7 @@ import asyncio, re
 class lookingHouse(Base):
     
     localMapping = {"UK":"GB"}
+    secondaryMapping = {"United States":"USA"}
     mapping = {}
 
     def __init__(self):
@@ -35,6 +36,8 @@ class lookingHouse(Base):
 
         if origin in self.localMapping: origin = self.localMapping[origin]
         country = self.getCountry(origin)
+        #Why is it called fucking USA
+        if country in self.secondaryMapping: country = self.secondaryMapping[country]
         if not country in self.mapping:
             print("Warning lookingHouse, No Probes found in Target Country")
             return False
