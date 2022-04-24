@@ -35,10 +35,11 @@ class dnstools(Base):
                         country = location[1]
                         city = location[0]
                 elif index == 2:
-                    avg = td.renderContents().decode().replace("ms","")
+                    avg = re.findall('>([0-9.]+)ms',str(td) , re.MULTILINE | re.DOTALL)
+                    if not avg: break
                 elif index == 3:
                     if origin == self.GetAlpha2(country):
-                        results[f"{city}{country}"] = {"provider":"n/a","avg":float(avg),"city":city,"source":self.__class__.__name__}
+                        results[f"{city}{country}"] = {"provider":"n/a","avg":float(avg[0]),"city":city,"source":self.__class__.__name__}
         print("Done dnstools.ws")
         return results
 
