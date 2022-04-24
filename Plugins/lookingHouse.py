@@ -2,7 +2,7 @@ from Plugins.base import Base
 from bs4 import BeautifulSoup
 from pyppeteer import launch
 import multiprocessing
-import asyncio, re
+import requests, asyncio, re
 
 class lookingHouse(Base):
     
@@ -23,9 +23,22 @@ class lookingHouse(Base):
         return True
 
     def run(self,point):
-        html = self.browseWrapper(f"https://looking.house/point.php?id={point[0]}&d={self.target}&f=ping",0,"pre")
-        if html == False: return {}
-        soup = BeautifulSoup(html,"html.parser")
+        headers = {
+        'Origin':'https://looking.house',
+        'Referer':f'https://looking.house/point.php?id={point[0]}&d={self.target}&f=ping',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+        'Content-Type':'application/x-www-form-urlencoded'}
+        dataRaw = f'id={point[0]}&domain={self.target}'
+        try: 
+            response = requests.post(url="https://looking.house/action.php?mode=looking_glass&action=ping", data=dataRaw, headers=headers,timeout=15)
+        except:
+            return {}
+
+        if response.status_code != 200: return {}
+        data = response.json()
+        if data['Error'] != 0: return {}
+
+        soup = BeautifulSoup(data['Template'],"html.parser")
         pre = soup.findAll('pre')
         avg = re.findall('avg\/.*?=.*?\/([0-9.]+)',str(pre[0]) , re.MULTILINE | re.DOTALL)
         if not avg: return {}
@@ -61,7 +74,7 @@ class lookingHouse(Base):
                     points[pointID] = {"location":location,"provider":provider,"city":city}
 
         self.target = target
-        if len(points) > 30: print("Notice lookingHouse, lots of probes gonna take some time")
+        if len(points) > 30: print(f"Notice lookingHouse, {len(points)} probes gonna take some time")
         pool = multiprocessing.Pool(processes = 4)
         results = pool.map(self.run, points.items())
 
