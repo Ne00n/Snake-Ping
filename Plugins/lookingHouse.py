@@ -23,13 +23,14 @@ class lookingHouse(Base):
         return True
 
     def run(self,point):
-        html = self.browseWrapper(f"https://looking.house/point.php?id={point}&d={self.target}&f=ping",0,"pre")
+        html = self.browseWrapper(f"https://looking.house/point.php?id={point[0]}&d={self.target}&f=ping",0,"pre")
         if html == False: return False
         soup = BeautifulSoup(html,"html.parser")
         pre = soup.findAll('pre')
         avg = re.findall('avg\/.*?=.*?\/([0-9.]+)',str(pre[0]) , re.MULTILINE | re.DOTALL)
-        if not avg: return False
-        return avg[0]
+        if not avg: return {}
+        point[1]['avg'] = avg[0]
+        return point[1]
 
     def engage(self,origin,target):
         print("Running lookingHouse")
@@ -59,13 +60,16 @@ class lookingHouse(Base):
                     city = location.split(", ")[1]
                     points[pointID] = {"location":location,"provider":provider,"city":city}
 
-        results = {}
         self.target = target
-        for point,details in points.items():
-            avg = self.run(point)
-            if avg == False: continue
-            results[f"{details['provider']}{details['location']}"] = {"provider":details['provider'],"avg":avg,"city":details['city'],"source":self.__class__.__name__}
+        if len(points) > 30: print("Notice lookingHouse, lots of probes gonna take some time")
+        pool = multiprocessing.Pool(processes = 4)
+        results = pool.map(self.run, points.items())
+
+        output = {}
+        for details in results:
+            if not "avg" in details: continue
+            output[f"{details['provider']}{details['location']}"] = {"provider":details['provider'],"avg":details['avg'],"city":details['city'],"source":self.__class__.__name__}
 
         print("Done lookingHouse")
-        return results
+        return output
 
