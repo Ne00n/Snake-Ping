@@ -26,33 +26,42 @@ class mudfish(Base):
 
         soup = BeautifulSoup(html,"html.parser")
         inputs = soup.findAll('input', id=re.compile('^checkbox_node_'))
-        probes = []
+        probes = {}
         for input in inputs:
-            if input['location'].startswith(country) and len(probes) <= 29:
+            if input['location'].startswith(country):
                 location = re.findall('\((.*?-\s.*?)(\)|\s[0-9]+)',str(input['location']) , re.MULTILINE)
                 if location[0][0] in probes: continue
-                element = await page.querySelector(f"#{input['id']}")
-                await element.click()
-                probes.append(location[0][0])
-            if len(probes) == 29: 
-                print("Warning mudfish, reached the limit of 29 probes")
-                break
+                probes[f"#{input['id']}"] = location[0][0]
 
         html = ""
         if len(probes) == 0:
             print("Warning mudfish, No Probes found in Target Country")
             return html
+        if len(probes) > 30: print(f"Notice mudfish, {len(probes)} probes gonna take some time")
 
-        element = await page.querySelector('#ping_start')
-        await element.click()
-
-        await asyncio.sleep(10)
-
-        html = await page.content()
+        response = []
+        runs = round(len(probes) / 29)
+        for run in range(runs):
+            targets = list(probes.items())[run*29:(run+1)*29]
+            #Batch Selection
+            for target in targets:
+                element = await page.querySelector(target[0])
+                await element.click()
+            #Batch Start
+            element = await page.querySelector('#ping_start')
+            await element.click()
+            #Wait
+            await asyncio.sleep(10)
+            #Save Batch Data
+            response.append(await page.content())
+            #Batch Remove Selection
+            for target in targets:
+                element = await page.querySelector(target[0])
+                await element.click()      
 
         await page.close()
         await browser.close()
-        return html
+        return response
 
     def engage(self,origin,target):
         print("Running mudfish")
@@ -64,23 +73,24 @@ class mudfish(Base):
             except:
                 return False
 
-        html = asyncio.run(self.browse(target,origin))
-        soup = BeautifulSoup(html,"html.parser")
-
         results = {}
-        tbody = soup.findAll('tbody')
-        if tbody:
-            for tr in tbody[0].findAll('tr'):
-                for index, td in enumerate(tr.findAll('td')):
-                    if index == 0:
-                        location = re.findall('<td>([A-Z]{2})\s(.*?)\s\((.*?)\s-\s(.*?)\)',str(td) , re.MULTILINE)
-                        provider = location[0][3]
-                        country = location[0][0]
-                        city = location[0][2]
-                    elif index == 4:
-                        avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
-                        if not avg: continue
-                        results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"source":self.__class__.__name__}
+        data = asyncio.run(self.browse(target,origin))
+        for entry in data:
+            soup = BeautifulSoup(entry,"html.parser")
+
+            tbody = soup.findAll('tbody')
+            if tbody:
+                for tr in tbody[0].findAll('tr'):
+                    for index, td in enumerate(tr.findAll('td')):
+                        if index == 0:
+                            location = re.findall('<td>([A-Z]{2})\s(.*?)\s\((.*?)\s-\s(.*?)\)',str(td) , re.MULTILINE)
+                            provider = location[0][3]
+                            country = location[0][0]
+                            city = location[0][2]
+                        elif index == 4:
+                            avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
+                            if not avg: continue
+                            results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"source":self.__class__.__name__}
         print("Done mudfish")
         return results
 
