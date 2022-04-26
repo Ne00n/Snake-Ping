@@ -11,6 +11,9 @@ class Base():
         for row in self.map:
             if target in row[field]: return row
 
+    def isComparable(self):
+        return False
+
     def GetAlpha2(self,target):
         if len(target) == 2: return target
         elif len(target) == 3:

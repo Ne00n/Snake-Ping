@@ -11,6 +11,17 @@ class mudfish(Base):
     def prepare(self):
         return True
 
+    def isComparable(self):
+        return True
+
+    def compare(self,countries,param):
+        origin, target = countries.split(',')
+        #get ips from origin
+        originData = self.engage(origin,"1.1.1.1")
+        #get ips from target
+        targetData = self.engage(target,"1.1.1.1")
+        return {"origin":originData,"target":targetData}
+
     async def browse(self,target,country):
         browser = await launch(headless=True)
         page = await browser.newPage()
@@ -87,10 +98,12 @@ class mudfish(Base):
                             provider = location[0][3]
                             country = location[0][0]
                             city = location[0][2]
+                        elif index == 1:
+                            ipv4 = re.findall('<td>([0-9.]+)<',str(td) , re.MULTILINE)[0]
                         elif index == 4:
                             avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
                             if not avg: continue
-                            results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"source":self.__class__.__name__}
+                            results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"ipv4":ipv4,"source":self.__class__.__name__}
         print("Done mudfish")
         return results
 

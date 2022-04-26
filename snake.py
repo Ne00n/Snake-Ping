@@ -24,14 +24,24 @@ def run(plugin):
     if response is not True:
         print(f"{plugin} failed to prepare")
         return {}
-    return myInstance.engage(origin,target)
+    if target == "compare" and myInstance.isComparable():
+        return myInstance.compare(origin,target)
+    else:
+        return myInstance.engage(origin,target)
 
 pool = Pool(max_workers = 6)
 results,dataUnsorted = pool.map(run, toLoad),{}
-for data in results:
-    if not data: continue
-    for probe,details in data.items():
-        dataUnsorted[probe] = {"plugin":details['source'],"avg":float(details['avg']),"provider":details['provider'],"city":details['city']}
+pool.shutdown(wait=True)
+
+if target == "compare":
+    print("Collection data for Comparison")
+    
+
+else:
+    for data in results:
+        if not data: continue
+        for probe,details in data.items():
+            dataUnsorted[probe] = {"plugin":details['source'],"avg":float(details['avg']),"provider":details['provider'],"city":details['city']}
 
 output = []
 output.append("Latency\tSource\tCity\tProvider")
