@@ -54,7 +54,7 @@ class lookingHouse(Base):
         if country in self.secondaryMapping: country = self.secondaryMapping[country]
         if not country in self.mapping:
             print("Warning lookingHouse, No Probes found in Target Country")
-            return False
+            return {}
         
         countryID = self.mapping[country]
         html = self.browseWrapper(f"https://looking.house/points.php?country={countryID}",3)
