@@ -15,6 +15,11 @@ class Base():
     def isComparable(self):
         return False
 
+    def compare(self,countries,param):
+        origin, target = countries.split(',')
+        originData = self.engage(origin,"1.1.1.1")
+        return originData
+
     def run(self,data):
         myClass = getattr(importlib.import_module(f"Plugins.{data['plugin']}"), data['plugin'])
         myInstance = myClass()

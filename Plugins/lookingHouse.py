@@ -25,11 +25,6 @@ class lookingHouse(Base):
     def isComparable(self):
         return True
 
-    def compare(self,countries,param):
-        origin, target = countries.split(',')
-        originData = self.engage(origin,"1.1.1.1")
-        return originData
-        
     def run(self,point):
         headers = {
         'Origin':'https://looking.house',

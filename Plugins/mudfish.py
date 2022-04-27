@@ -14,11 +14,6 @@ class mudfish(Base):
     def isComparable(self):
         return True
 
-    def compare(self,countries,param):
-        origin, target = countries.split(',')
-        originData = self.engage(origin,"1.1.1.1")
-        return originData
-
     async def browse(self,target,country):
         browser = await launch(headless=True,executablePath='/snap/bin/chromium')
         page = await browser.newPage()
