@@ -15,6 +15,12 @@ apt-get -y install chromium-browser
 
 **Examples**<br />
 
+To Ping from all Nodes located in the Netherlands
 ```
 python3 snake.py NL 1.1.1.1
+```
+
+To find the lowest route in-between 2 Servers in 2 different countries
+```
+python3 snake.py UK,NL compare
 ```
