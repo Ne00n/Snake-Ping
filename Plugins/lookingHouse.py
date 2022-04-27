@@ -22,6 +22,14 @@ class lookingHouse(Base):
                 self.mapping[location[0][1]] = location[0][0]
         return True
 
+    def isComparable(self):
+        return True
+
+    def compare(self,countries,param):
+        origin, target = countries.split(',')
+        originData = self.engage(origin,"1.1.1.1")
+        return originData
+        
     def run(self,point):
         headers = {
         'Origin':'https://looking.house',
@@ -67,6 +75,7 @@ class lookingHouse(Base):
             for index, td in enumerate(tr.findAll("td")):
                 if index == 0:
                     pointID = re.findall('point.php\?id=([0-9]+)',str(td) , re.MULTILINE | re.DOTALL)[0]
+                    ipv4 = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)[0]
                 elif index == 1:
                     location = re.findall('src=".*?> (.*?)\n',str(td) , re.MULTILINE | re.DOTALL)[0]
                     provider = re.findall('company.php.*?>(.*?)<',str(td) , re.MULTILINE | re.DOTALL)[0]
@@ -81,7 +90,7 @@ class lookingHouse(Base):
         output = {}
         for details in results:
             if not "avg" in details: continue
-            output[f"{details['provider']}{details['location']}"] = {"provider":details['provider'],"avg":details['avg'],"city":details['city'],"source":self.__class__.__name__}
+            output[f"{details['provider']}{details['location']}"] = {"provider":details['provider'],"avg":details['avg'],"city":details['city'],"ipv4":ipv4,"source":self.__class__.__name__}
 
         print("Done lookingHouse")
         return output
