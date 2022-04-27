@@ -1,5 +1,6 @@
-from pyppeteer import launch
 import ipaddress, asyncio, time, json, re
+from pyppeteer import launch
+import importlib.util
 
 class Base():
 
@@ -13,6 +14,20 @@ class Base():
 
     def isComparable(self):
         return False
+
+    def run(self,data):
+        myClass = getattr(importlib.import_module(f"Plugins.{data['plugin']}"), data['plugin'])
+        myInstance = myClass()
+        response = myInstance.prepare()
+        if response is not True:
+            print(f"{data['plugin']} failed to prepare")
+            return {}
+        if data['target'] == "compare" and myInstance.isComparable():
+            return myInstance.compare(data['origin'],data['target'])
+        elif data['target'] != "compare":
+            return myInstance.engage(data['origin'],data['target'])
+        else:
+            return {}
 
     def GetAlpha2(self,target):
         if len(target) == 2: return target
@@ -44,18 +59,25 @@ class Base():
             return False
 
     async def browse(self,target,wait=10,element=""):
-        browser = await launch()
-        page = await browser.newPage()   
+        browser = await launch(headless=True,executablePath='/snap/bin/chromium')
 
-        await page.goto(target, {'waitUntil' : 'domcontentloaded'})
+        for run in range(4):
+            page = await browser.newPage()   
+            try:
+                await page.goto(target, {'waitUntil' : 'domcontentloaded'})
 
-        if wait == 0:
-            await page.waitForSelector(element)
-        else:
-            await asyncio.sleep(wait)
+                if wait == 0:
+                    await page.waitForSelector(element)
+                else:
+                    await asyncio.sleep(wait)
 
-        html = await page.content()
-        await page.close()
+                html = await page.content()
+                await page.close()
+                break
+            except:
+                print("Page crashed, retrying")
+                print("Closing page")
+                await page.close()
         await browser.close()
         return html
 

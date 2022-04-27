@@ -16,14 +16,11 @@ class mudfish(Base):
 
     def compare(self,countries,param):
         origin, target = countries.split(',')
-        #get ips from origin
         originData = self.engage(origin,"1.1.1.1")
-        #get ips from target
-        targetData = self.engage(target,"1.1.1.1")
-        return {"origin":originData,"target":targetData}
+        return originData
 
     async def browse(self,target,country):
-        browser = await launch(headless=True)
+        browser = await launch(headless=True,executablePath='/snap/bin/chromium')
         page = await browser.newPage()
 
         await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36')
@@ -52,6 +49,7 @@ class mudfish(Base):
 
         response = []
         runs = round(len(probes) / 29)
+        if runs < 29: runs = 1
         for run in range(runs):
             targets = list(probes.items())[run*29:(run+1)*29]
             #Batch Selection
