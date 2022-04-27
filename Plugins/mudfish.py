@@ -34,12 +34,13 @@ class mudfish(Base):
 
         soup = BeautifulSoup(html,"html.parser")
         inputs = soup.findAll('input', id=re.compile('^checkbox_node_'))
-        probes = {}
+        probes,filter = {},[]
         for input in inputs:
             if input['location'].startswith(country):
                 location = re.findall('\((.*?-\s.*?)(\)|\s[0-9]+)',str(input['location']) , re.MULTILINE)
-                if location[0][0] in probes: continue
+                if location[0][0] in filter: continue
                 probes[f"#{input['id']}"] = location[0][0]
+                filter.append(location[0][0])
 
         html = ""
         if len(probes) == 0:
