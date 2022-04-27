@@ -42,9 +42,10 @@ class mtrsh(Base):
             print("Warning mtr.sh, No Probes found in Target Country")
             return {}
 
+        if len(self.mapping[country]) > 30: print(f"Notice mtr.sh, {len(self.mapping[country])} probes gonna take some time")
         output = {}
         self.target = target
-        pool = multiprocessing.Pool(processes = 4)
+        pool = multiprocessing.Pool(processes = 5)
         results = pool.map(self.run, self.mapping[country])
 
         for result in results:
