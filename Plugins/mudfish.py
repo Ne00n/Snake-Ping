@@ -71,6 +71,7 @@ class mudfish(Base):
     def engage(self,origin,target):
         print("Running mudfish")
 
+        self.start()
         if not self.validateIP(target):
             try:
                 ip = socket.gethostbyname(target)
@@ -98,6 +99,7 @@ class mudfish(Base):
                             avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
                             if not avg: continue
                             results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"ipv4":ipv4,"source":self.__class__.__name__}
-        print("Done mudfish")
+        total = self.diff()
+        print(f"Done mudfish done in {total}s")
         return results
 
