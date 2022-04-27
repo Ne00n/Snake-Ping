@@ -32,7 +32,8 @@ if target == "compare":
         combined.update(pluginData)
     print("Collection data")
     originCountry, targetCountry = origin.split(',')
-    for probe,probeDetails in combined.items():
+    for i, (probe,probeDetails) in enumerate(combined.items()):
+        print(f"{i+1} of {len(combined)}")
         print(f"Getting Data for {probe}")
         for index, row in enumerate(toLoad): toLoad[index] = {"plugin":row['plugin'],"origin":targetCountry,"target":probeDetails['ipv4']}
         pool = Pool(max_workers = 6)
@@ -41,33 +42,29 @@ if target == "compare":
         for data in probeResults:
             if not data: continue
             for probeTarget,probeTargetDetails in data.items():
-                if not probe in pingData: pingData[probe] = []
-                pingData[probe].append(probeTargetDetails)
+                probeTargetDetails['probe'] = probe
+                pingData[f"{probe}{probeDetails['source']}{probeTarget}"] = probeTargetDetails
     #sort data by probe
-    for probe,probeData in pingData.items():
-        pingData[probe] = sorted(probeData, key=lambda d: float(d['avg'])) 
+    pingData = sorted(pingData.items(), key=lambda d: float(d[1]['avg'])) 
     #Generate Output
-    for probe,probeData in pingData.items():
-        output.append(f"Probe {probe}")
-        output.append("Latency\tSource\tCity\tProvider")
-        output.append("-------\t-------\t-------\t-------")
-        for index, probeDetails in enumerate(probeData):
-            if index < 10:
-                avg = "{:.2f}ms".format(float(probeDetails['avg']))
-                output.append(f"{avg}\t{probeDetails['source']}\t{probeDetails['city']}\t{probeDetails['provider']}")
+    output.append("Latency\tSource\tProbe\tCity\tProvider")
+    output.append("-------\t-------\t-------\t-------\t-------")
+    for probeData in pingData:
+        avg = "{:.2f}ms".format(float(probeData[1]['avg']))
+        output.append(f"{avg}\t{probeData[1]['source']}\t{probeData[1]['probe']}\t{probeData[1]['city']}\t{probeData[1]['provider']}")
 
 else:
     for data in results:
         if not data: continue
         for probe,details in data.items():
             dataUnsorted[probe] = {"plugin":details['source'],"avg":float(details['avg']),"provider":details['provider'],"city":details['city']}
-        #Generate Output
-        output.append("Latency\tSource\tCity\tProvider")
-        output.append("-------\t-------\t-------\t-------")
-        dataSorted = sorted(dataUnsorted.items(), key=lambda x: x[1]['avg'])
-        for data in dataSorted:
-            avg = "{:.2f}ms".format(data[1]['avg'])
-            output.append(f"{avg}\t{data[1]['plugin']}\t{data[1]['city']}\t{data[1]['provider']}")
+    #Generate Output
+    output.append("Latency\tSource\tCity\tProvider")
+    output.append("-------\t-------\t-------\t-------")
+    dataSorted = sorted(dataUnsorted.items(), key=lambda x: x[1]['avg'])
+    for data in dataSorted:
+        avg = "{:.2f}ms".format(data[1]['avg'])
+        output.append(f"{avg}\t{data[1]['plugin']}\t{data[1]['city']}\t{data[1]['provider']}")
 
 def formatTable(list):
     longest,response = {},""
