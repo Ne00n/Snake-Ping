@@ -89,3 +89,21 @@ class Base():
                 print(f"Retrying {target}")
                 time.sleep(2)
                 if run == 3: return False
+
+    def formatTable(self,list):
+        longest,response = {},""
+        for row in list:
+            elements = row.split("\t")
+            for index, entry in enumerate(elements):
+                if not index in longest: longest[index] = 0
+                if len(entry) > longest[index]: longest[index] = len(entry)
+        for i, row in enumerate(list):
+            elements = row.split("\t")
+            for index, entry in enumerate(elements):
+                if len(entry) < longest[index]:
+                    diff = longest[index] - len(entry)
+                    while len(entry) < longest[index]:
+                        entry += " "
+                response += f"{entry}" if response.endswith("\n") or response == "" else f" {entry}"
+            if i < len(list) -1: response += "\n"
+        return response

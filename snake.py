@@ -66,24 +66,6 @@ else:
         avg = "{:.2f}ms".format(data[1]['avg'])
         output.append(f"{avg}\t{data[1]['plugin']}\t{data[1]['city']}\t{data[1]['provider']}")
 
-def formatTable(list):
-    longest,response = {},""
-    for row in list:
-        elements = row.split("\t")
-        for index, entry in enumerate(elements):
-            if not index in longest: longest[index] = 0
-            if len(entry) > longest[index]: longest[index] = len(entry)
-    for i, row in enumerate(list):
-        elements = row.split("\t")
-        for index, entry in enumerate(elements):
-            if len(entry) < longest[index]:
-                diff = longest[index] - len(entry)
-                while len(entry) < longest[index]:
-                    entry += " "
-            response += f"{entry}" if response.endswith("\n") or response == "" else f" {entry}"
-        if i < len(list) -1: response += "\n"
-    return response
-
-output = formatTable(output)
+output = notMyBase.formatTable(output)
 print(f"\nResults")
 print(output)
