@@ -1,57 +1,76 @@
 from Plugins.base import Base
-import requests, json, re
+from bs4 import BeautifulSoup
+from pyppeteer import launch
+import asyncio, socket, re
 import multiprocessing
 
 class mtrsh(Base):
 
     localMapping = {"UK":"GB"}
-    mapping = {}
-    headers = {
-        'Host':'mtr.sh',
-        'Accept':'application/json;',
-        'X-Application-For':'Snake-Ping',
-        'Accept-Encoding':'gzip, deflate',
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'}
     
     def __init__(self):
         self.load()
 
     def prepare(self):
-        response = requests.get(url="https://mtr.sh/probes.json", headers=self.headers)
-        if response.status_code != 200: return False
-        probes = response.json()
-        for name,details in probes.items():
-            if details['status'] is False: continue
-            if not details['country'] in self.mapping: self.mapping[details['country']] = []
-            self.mapping[details['country']].append({"probe":name,"provider":details['provider'],"city":details['city']})
         return True
 
-    def run(self,probe):
-        response = requests.get(url=f"https://mtr.sh/{probe['probe']}/ping/{self.target }", headers=self.headers)
-        if response.status_code != 200: return {}
-        avg = re.findall("avg\/.*?=.*?\/([0-9.]+)",response.text, re.MULTILINE)
-        if not avg: return {}
-        probe['avg'] = avg[0]
-        return probe
+    async def browse(self,target,country):
+        browser = await launch(headless=True,executablePath='/snap/bin/chromium')
+        page = await browser.newPage()
+
+        await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36')
+        await page.goto(f"https://mtr.sh/", {'waitUntil' : 'domcontentloaded'})
+
+        await asyncio.sleep(1)
+
+        await page.focus('#target')
+        await page.keyboard.type(target)
+        html = await page.content()
+
+        soup = BeautifulSoup(html,"html.parser")
+        divs = soup.select("div[class^='toggle btn']")
+        marked = 0
+        element = await page.querySelectorAll("div.toggle")
+        for index, div in enumerate(divs):
+            input = div.select("input")[0]
+            if input.has_attr("data-asnumber") == False or input.has_attr("disabled"): continue
+            alpha2 = self.GetAlpha2(input['data-country'])
+            if alpha2 != country: continue
+            await element[index].click()
+            marked += 1
+
+        await asyncio.sleep(1)
+
+        if marked > 1:
+            await element[3].click()
+            element = await page.querySelector('#runtest')
+            await element.click()
+
+            await asyncio.sleep(20)
+            html = await page.content()
+        else:
+            print("Warning mtrsh, No Probes found in Target Country")
+
+        await page.close()
+        await browser.close()
+        return html
 
     def engage(self,origin,target):
         print("Running mtr.sh")
         if origin in self.localMapping: origin = self.localMapping[origin]
-        country = self.getCountry(origin)
-        if not country in self.mapping:
-            print("Warning mtr.sh, No Probes found in Target Country")
-            return {}
+        self.start()
 
-        if len(self.mapping[country]) > 30: print(f"Notice mtr.sh, {len(self.mapping[country])} probes gonna take some time")
+        html = asyncio.run(self.browse(target,origin))
+        soup = BeautifulSoup(html,"html.parser")
+        panels = soup.select("div.panel")
         output = {}
-        self.target = target
-        pool = multiprocessing.Pool(processes = 5)
-        results = pool.map(self.run, self.mapping[country])
-
-        for result in results:
-            if not "avg" in result: continue
-            output[result['probe']] = {"provider":result['provider'],"city":result['city'],"avg":result['avg'],"source":self.__class__.__name__}
-        print("Done mtr.sh")
+        for panel in panels:
+            data = re.findall('\| Ping from\s(.*?)\sAS.*?in\s(.*?),(.*?)\s<',str(panel) , re.MULTILINE)
+            avg = re.findall('mdev =.*?\/([0-9.]+)',str(panel) , re.MULTILINE)
+            if not avg: continue
+            output[f"{data[0][0]}{data[0][2]}"] = {"provider":data[0][0],"city":data[0][2],"avg":avg[0],"source":self.__class__.__name__}
+        total = self.diff()
+        print(f"Done mtr.sh done in {total}s")
         return output
 
 
