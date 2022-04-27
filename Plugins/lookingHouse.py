@@ -51,6 +51,7 @@ class lookingHouse(Base):
     def engage(self,origin,target):
         print("Running lookingHouse")
 
+        self.start()
         if origin in self.localMapping: origin = self.localMapping[origin]
         country = self.getCountry(origin)
         #Why is it called fucking USA
@@ -86,7 +87,8 @@ class lookingHouse(Base):
         for details in results:
             if not "avg" in details: continue
             output[f"{details['provider']}{details['location']}"] = {"provider":details['provider'],"avg":details['avg'],"city":details['city'],"ipv4":ipv4,"source":self.__class__.__name__}
-
-        print("Done lookingHouse")
+            
+        total = self.diff()
+        print(f"Done lookingHouse done in {total}s")
         return output
 
