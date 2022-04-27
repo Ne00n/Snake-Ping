@@ -1,4 +1,5 @@
 import ipaddress, asyncio, time, json, re
+from timeit import default_timer as timer
 from pyppeteer import launch
 import importlib.util
 
@@ -11,6 +12,12 @@ class Base():
     def find(self,target,field):
         for row in self.map:
             if target in row[field]: return row
+
+    def start(self):
+        self.timer = timer()
+
+    def diff(self):
+        return round((timer() - self.timer),2)
 
     def isComparable(self):
         return False
