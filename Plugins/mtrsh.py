@@ -46,7 +46,7 @@ class mtrsh(Base):
             element = await page.querySelector('#runtest')
             await element.click()
 
-            await asyncio.sleep(20)
+            await page.waitForSelector('div.progress-bar', {"hidden": True})
             html = await page.content()
         else:
             print("Warning mtrsh, No Probes found in Target Country")
