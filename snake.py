@@ -34,7 +34,7 @@ if target == "compare":
     originCountry, targetCountry = origin.split(',')
     for i, (probe,probeDetails) in enumerate(combined.items()):
         print(f"{i+1} of {len(combined)}")
-        print(f"Getting Data for {probe}")
+        print(f"Getting Data for {probeDetails['city']}, {probeDetails['provider']}")
         for index, row in enumerate(toLoad): toLoad[index] = {"plugin":row['plugin'],"origin":targetCountry,"target":probeDetails['ipv4']}
         pool = Pool(max_workers = 6)
         probeResults = pool.map(notMyBase.run, toLoad)
@@ -42,7 +42,7 @@ if target == "compare":
         for data in probeResults:
             if not data: continue
             for probeTarget,probeTargetDetails in data.items():
-                probeTargetDetails['probe'] = probe
+                probeTargetDetails['probe'] = f"{probeDetails['city']}, {probeDetails['provider']}"
                 pingData[f"{probe}{probeDetails['source']}{probeTarget}"] = probeTargetDetails
     #sort data by probe
     pingData = sorted(pingData.items(), key=lambda d: float(d[1]['avg'])) 
