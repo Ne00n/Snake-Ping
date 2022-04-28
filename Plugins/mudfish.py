@@ -19,7 +19,12 @@ class mudfish(Base):
         page = await browser.newPage()
 
         await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36')
-        await page.goto(f"https://ping.mudfish.net/", {'waitUntil' : 'domcontentloaded'})
+        for run in range(4):
+            try:
+                await page.goto(f"https://ping.mudfish.net/", {'waitUntil' : 'domcontentloaded'})
+                break
+            except:
+                print("Page did not load in 30s, retrying")
 
         await asyncio.sleep(3)
 
