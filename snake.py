@@ -47,11 +47,11 @@ if target == "compare":
     #sort data by probe
     pingData = sorted(pingData.items(), key=lambda d: float(d[1]['avg'])) 
     #Generate Output
-    output.append("Latency\tSource\tProbe\tCity\tProvider")
-    output.append("-------\t-------\t-------\t-------\t-------")
+    output.append("Latency\tSource\tOrigin\tDestination")
+    output.append("-------\t-------\t-------\t-------")
     for probeData in pingData:
         avg = "{:.2f}ms".format(float(probeData[1]['avg']))
-        output.append(f"{avg}\t{probeData[1]['source']}\t{probeData[1]['probe']}\t{probeData[1]['city']}\t{probeData[1]['provider']}")
+        output.append(f"{avg}\t{probeData[1]['source']}\t{probeData[1]['city']} {probeData[1]['provider']}\t{probeData[1]['probe']}")
 
 else:
     for data in results:
