@@ -2,6 +2,8 @@
 
 ## Work in Progress
 
+Tested on Ubuntu 20.04 with crapd
+
 **Dependencies**<br />
 Python 3.7 or higher<br />
 ```
@@ -10,7 +12,7 @@ apt-get -y install chromium-browser
 ```
 
 **Known Bugs**<br />
-- May crash any time (fill a tiket, if it does)
+- May crash sometimes (fill a tiket, if it does)
 - Country Mapping may break depending on Plugin and Country
 
 **Examples**<br />
