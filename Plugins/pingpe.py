@@ -7,7 +7,8 @@ class pingpe(Base):
     
     localMapping = {"UAE":"ARE"}
 
-    def __init__(self):
+    def __init__(self,config):
+        self.config = config
         self.load()
 
     def prepare(self):

@@ -1,6 +1,6 @@
 from concurrent.futures import ProcessPoolExecutor as Pool
 from Plugins.base import Base
-import sys, os
+import sys, json, os
 
 print("Snake-Ping")
 plugins = os.listdir("Plugins")
@@ -10,6 +10,13 @@ origin = sys.argv[1]
 target = sys.argv[2]
 pluginToLoad = sys.argv[3] if len(sys.argv) == 4 else ""
 
+try:
+    with open('config.json') as handle:
+        config = json.loads(handle.read())
+except Exception as e:
+    print(f"Failed to load config.json {e}")
+    exit()
+
 data,toLoad = {},[]
 for filename in plugins:
     if not filename.endswith(".py") or filename == "base.py": continue
@@ -17,10 +24,10 @@ for filename in plugins:
     if pluginToLoad != "" and plugin != pluginToLoad: continue
     toLoad.append({"plugin":plugin,"origin":origin,"target":target})
 
-notMyBase = Base()
+notMyBase = Base(config)
 dataUnsorted,results,output = {},[],[]
 
-pool = Pool(max_workers = 6)
+pool = Pool(max_workers = config['workers'])
 results = pool.map(notMyBase.run, toLoad)
 pool.shutdown(wait=True)
 
@@ -36,7 +43,7 @@ if target == "compare":
         print(f"{i+1} of {len(combined)}")
         print(f"Getting Data for {probeDetails['city']} {probeDetails['provider']}")
         for index, row in enumerate(toLoad): toLoad[index] = {"plugin":row['plugin'],"origin":targetCountry,"target":probeDetails['ipv4']}
-        pool = Pool(max_workers = 6)
+        pool = Pool(max_workers = config['workers'])
         probeResults = pool.map(notMyBase.run, toLoad)
         pool.shutdown(wait=True)
         for data in probeResults:

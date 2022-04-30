@@ -5,7 +5,10 @@ import importlib.util
 
 class Base():
 
-    def load(self):
+    def __init__(self,config={}):
+        self.config = config
+
+    def load(self,config={}):
         with open('mapping.json', 'r') as f:
             self.map = json.load(f)
 
@@ -29,7 +32,7 @@ class Base():
 
     def run(self,data):
         myClass = getattr(importlib.import_module(f"Plugins.{data['plugin']}"), data['plugin'])
-        myInstance = myClass()
+        myInstance = myClass(self.config)
         response = myInstance.prepare()
         if response is not True:
             print(f"{data['plugin']} failed to prepare")
@@ -71,7 +74,7 @@ class Base():
             return False
 
     async def browse(self,target,wait=10,element=""):
-        browser = await launch(headless=True,executablePath='/snap/bin/chromium')
+        browser = await launch(headless=True,executablePath=self.config['executablePath'])
 
         for run in range(4):
             page = await browser.newPage()   

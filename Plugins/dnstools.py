@@ -5,7 +5,8 @@ import asyncio, re
 
 class dnstools(Base):
     
-    def __init__(self):
+    def __init__(self,config):
+        self.config = config
         self.load()
 
     def prepare(self):
