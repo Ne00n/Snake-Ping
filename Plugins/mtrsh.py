@@ -66,7 +66,7 @@ class mtrsh(Base):
         panels = soup.select("div.panel")
         output = {}
         for panel in panels:
-            data = re.findall('\| Ping from\s(.*?)\sAS.*?in\s(.*?),(.*?)\s<',str(panel) , re.MULTILINE)
+            data = re.findall('\| Ping from\s(.*?)\sAS.*?in\s(.*?),\s(.*?)\s<',str(panel) , re.MULTILINE)
             avg = re.findall('mdev =.*?\/([0-9.]+)',str(panel) , re.MULTILINE)
             if not avg: continue
             output[f"{data[0][0]}{data[0][2]}"] = {"provider":data[0][0],"city":data[0][2],"avg":avg[0],"source":self.__class__.__name__}
