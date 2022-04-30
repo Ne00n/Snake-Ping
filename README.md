@@ -15,6 +15,10 @@ apt-get -y install chromium-browser
 - May crash sometimes (fill a tiket, if it does)
 - Country Mapping may break depending on Plugin and Country
 
+**Chromium**<br />
+You may have to edit "executablePath" in the config.json</br>
+If you are using snap, the default should be fine.</br>
+
 **Examples**<br />
 
 To Ping from all Nodes located in the Netherlands
