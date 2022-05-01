@@ -25,6 +25,9 @@ class Base():
     def isComparable(self):
         return False
 
+    def canRunAny(self):
+        return False
+
     def compare(self,countries,param):
         origin, target = countries.split(',')
         originData = self.engage(origin,"1.1.1.1")
@@ -39,6 +42,9 @@ class Base():
             return {}
         if data['target'] == "compare" and myInstance.isComparable():
             return myInstance.compare(data['origin'],data['target'])
+        elif data['origin'] == "any":
+            if myInstance.canRunAny() is False: return {}
+            return myInstance.engage(data['origin'],data['target'])
         elif data['target'] != "compare":
             return myInstance.engage(data['origin'],data['target'])
         else:

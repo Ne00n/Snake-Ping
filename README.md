@@ -26,6 +26,12 @@ To Ping from all Nodes located in the Netherlands
 python3 snake.py NL 1.1.1.1
 ```
 
+To Ping from all Nodes, worldwide</br>
+Disabled for some plugins, due the amount of requests that would result in
+```
+python3 snake.py any 1.1.1.1
+```
+
 To find the lowest route in-between 2 Servers in 2 different countries
 ```
 python3 snake.py UK,NL compare

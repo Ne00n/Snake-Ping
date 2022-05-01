@@ -14,6 +14,9 @@ class pingpe(Base):
     def prepare(self):
         return True
 
+    def canRunAny(self):
+        return True
+
     def engage(self,origin,target):
         print("Running ping.pe")
 
@@ -42,7 +45,7 @@ class pingpe(Base):
                 location = country[0].split(", ")
                 country = location[0]
                 city = location[2]
-            if origin == self.GetAlpha2(country):
+            if origin == self.GetAlpha2(country) or origin == "any":
                 results[probe[0]] = {"provider":provider[0],"avg":avg[0],"city":city,"source":self.__class__.__name__}
         print("Done ping.pe")
         return results

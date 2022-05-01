@@ -12,6 +12,9 @@ class pingsx(Base):
     def prepare(self):
         return True
 
+    def canRunAny(self):
+        return True
+
     async def browse(self,target):
         browser = await launch(headless=True)
         page = await browser.newPage()
@@ -50,7 +53,7 @@ class pingsx(Base):
                 elif index == 6:
                     avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
                     if not avg: continue
-                    if origin == self.GetAlpha2(country):
+                    if origin == self.GetAlpha2(country) or origin == "any":
                         results[f"{provider}{country}{city}"] = {"provider":provider,"avg":avg[0],"city":city,"source":self.__class__.__name__}
         print("Done ping.sx")
         return results

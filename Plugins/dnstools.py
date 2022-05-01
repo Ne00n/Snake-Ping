@@ -12,6 +12,9 @@ class dnstools(Base):
     def prepare(self):
         return True
 
+    def canRunAny(self):
+        return True
+
     def engage(self,origin,target):
         print("Running dnstools.ws")
 
@@ -39,7 +42,7 @@ class dnstools(Base):
                     avg = re.findall('>([0-9.]+)ms',str(td) , re.MULTILINE | re.DOTALL)
                     if not avg: break
                 elif index == 3:
-                    if origin == self.GetAlpha2(country):
+                    if origin == self.GetAlpha2(country) or origin == "any":
                         results[f"{city}{country}"] = {"provider":"n/a","avg":float(avg[0]),"city":city,"source":self.__class__.__name__}
         print("Done dnstools.ws")
         return results
