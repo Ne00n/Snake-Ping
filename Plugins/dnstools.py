@@ -32,8 +32,7 @@ class dnstools(Base):
                     if not location: continue
                     countryCase = location[0].count(",")
                     if countryCase == 0:
-                        country = location[0]
-                        city = "n/a"
+                        city = country = location[0]
                     elif countryCase == 1:
                         location = location[0].split(", ")
                         country = location[1]
