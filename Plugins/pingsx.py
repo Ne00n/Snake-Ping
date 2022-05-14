@@ -50,7 +50,8 @@ class pingsx(Base):
                     city = re.findall('flex-0">(.*?)<',str(td) , re.MULTILINE)[0]
                 elif index == 1:
                     provider = re.findall('>(.{1,25}?)<',str(td) , re.MULTILINE)[0]
-                elif index == 6:
+                elif index == 7:
+                    #why best? avg is lower than best sometimes
                     avg = re.findall('>([0-9.]+)<',str(td) , re.MULTILINE)
                     if not avg: continue
                     if origin == self.GetAlpha2(country) or origin == "any":
