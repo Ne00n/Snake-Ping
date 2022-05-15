@@ -83,6 +83,8 @@ class lookingHouse(Base):
         if len(points) > 30: print(f"Notice lookingHouse, {len(points)} probes gonna take some time")
         pool = multiprocessing.Pool(processes = 4)
         results = pool.map(self.run, points.items())
+        pool.close()
+        pool.join()
 
         output = {}
         for details in results:

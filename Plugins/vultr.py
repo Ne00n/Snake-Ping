@@ -59,6 +59,8 @@ class vultr(Base):
         probes = self.locations[origin]
         pool = multiprocessing.Pool(processes = 2)
         results = pool.map(self.run, probes)
+        pool.close()
+        pool.join()
 
         output = {}
         for details in results:
