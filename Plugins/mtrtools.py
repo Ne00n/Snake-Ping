@@ -4,7 +4,7 @@ from pyppeteer import launch
 import asyncio, socket, re
 import multiprocessing
 
-class mtrsh(Base):
+class mtrtools(Base):
 
     localMapping = {"UK":"GB"}
     
