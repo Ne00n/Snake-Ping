@@ -16,7 +16,7 @@ class pingsx(Base):
         return True
 
     async def browse(self,target):
-        browser = await launch(headless=True)
+        browser = await launch(headless=True,executablePath=self.config['executablePath'])
         page = await browser.newPage()
 
         await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36')
