@@ -9,6 +9,7 @@ Python 3.7 or higher<br />
 ```
 pip3 install bs4 pyppeteer
 apt-get -y install chromium-browser
+cp config.example.json config.json
 ```
 
 **Known Bugs**<br />
